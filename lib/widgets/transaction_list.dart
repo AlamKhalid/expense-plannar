@@ -11,10 +11,9 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 450,
-      child: _userTransactions.isEmpty
-          ? Column(
+    return _userTransactions.isEmpty
+        ? LayoutBuilder(
+            builder: (ctx, constraints) => Column(
               children: <Widget>[
                 Text(
                   "No transactions added yet!",
@@ -24,43 +23,51 @@ class TransactionList extends StatelessWidget {
                   height: 10,
                 ),
                 Container(
-                  height: 200,
+                  height: constraints.maxHeight * 0.6,
                   child: Image.asset(
                     "/assests/images/waiting.png",
                     fit: BoxFit.cover,
                   ),
                 ),
               ],
-            )
-          : ListView.builder(
-              itemBuilder: (ctx, idx) {
-                return Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: FittedBox(
-                            child: Text("\$${_userTransactions[idx].amount}")),
-                      ),
-                    ),
-                    title: Text(_userTransactions[idx].title,
-                        style: Theme.of(context).textTheme.headline6),
-                    subtitle: Text(
-                        DateFormat.yMMMd().format(_userTransactions[idx].date)),
-                    trailing: IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Theme.of(context).errorColor,
-                      onPressed: () =>
-                          deleteTransaction(_userTransactions[idx].id),
+            ),
+          )
+        : ListView.builder(
+            itemBuilder: (ctx, idx) {
+              return Card(
+                elevation: 5,
+                margin: EdgeInsets.symmetric(vertical: 8, horizontal: 5),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: FittedBox(
+                          child: Text("\$${_userTransactions[idx].amount}")),
                     ),
                   ),
-                );
-              },
-              itemCount: _userTransactions.length,
-            ),
-    );
+                  title: Text(_userTransactions[idx].title,
+                      style: Theme.of(context).textTheme.headline6),
+                  subtitle: Text(
+                      DateFormat.yMMMd().format(_userTransactions[idx].date)),
+                  trailing: MediaQuery.of(context).size.width > 360
+                      ? FlatButton.icon(
+                          onPressed: () =>
+                              deleteTransaction(_userTransactions[idx].id),
+                          icon: Icon(Icons.delete),
+                          label: Text("Delete"),
+                          textColor: Theme.of(context).errorColor,
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: Theme.of(context).errorColor,
+                          onPressed: () =>
+                              deleteTransaction(_userTransactions[idx].id),
+                        ),
+                ),
+              );
+            },
+            itemCount: _userTransactions.length,
+          );
   }
 }
